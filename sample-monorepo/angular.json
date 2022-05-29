@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "lib-shared": "libs/lib-shared",
+    "sample-angular": "apps/sample-angular",
+    "sample-angular-e2e": "apps/sample-angular-e2e",
+    "sample-react": "apps/sample-react",
+    "sample-react-e2e": "apps/sample-react-e2e"
+  }
+}
