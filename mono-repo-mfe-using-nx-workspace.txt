@@ -1,0 +1,90 @@
+MONO repo MFE using NX:
+***********************
+Refer: https://www.youtube.com/watch?v=w9BgA4_Gbkw
+
+- Install nx node package globally or locally using npx.
+	npm i -g nx
+
+Creating Angular application with workspace:
+--------------------------------------------
+cmd: npx create-nx-workspace sample-monorepo --preset=angular
+Need to install the following packages:
+  create-nx-workspace
+Ok to proceed? (y) y
+√ Application name                    · sample-angular
+√ Default stylesheet format           · css
+√ Use Nx Cloud? (It's free and doesn't require registration.) · No
+
+-------------
+- All the applications built on say angular/react will sit under app folder.
+- And all the common code lets say API/ business logic written in nest js will sit under lib folder.
+- to check what are all packages installed -> go to workspace -> and fire cmd nx list
+
+
+Creating react App:
+------------------
+- To create react app using nx -> we need nx react plugin -> so install it
+	- nx add @nrwl/react
+- now add the react application to workspace.
+	- nx g @nrwl/react:app sample-react
+- Now if we observe in apps folder -> sample-react application created.
+
+-----------------------
+Running Applications:
+---------------------
+- Go to work space: E:\Projects\micro-front-end-pocs\nx-mono-repo-mfe-poc\sample-monorepo
+- Open two terminals -> as we have two apps (angular and react)
+- To start angular app:
+	- nx run sample-angular:serve --port=4001
+	- open browser and very whether the app is running or not:
+		http://localhost:4001/
+- To start react app:
+	- nx serve sample-react
+	- open browser and very whether the app is running or not:
+		http://localhost:4200/
+
+-----------------------------
+Creating common libs:
+--------------------
+- Now lets us create a library (lib-shared -> library name) which is shared by both angular and react applications.
+	- CMD: ng g @nrwl/workspace:lib lib-shared
+	- Now if we go to libs folder we can see : lib-shared folder - along with all the files.
+- Now if we observer the nx-mono-repo-mfe-poc\sample-monorepo\tsconfig.base.json file there is path created.
+	{
+		"paths": {
+			"@sample-monorepo/lib-shared": ["libs/lib-shared/src/index.ts"]
+		}
+	}
+- using this key : "@sample-monorepo/lib-shared" we can import the library in applications (if we want to shorten we can change it).
+- Now to lib-shared and design a new custom web component.
+	- nx-mono-repo-mfe-poc\sample-monorepo\libs\lib-shared\src\lib\lib-shared.ts
+	- 
+		
+		export class MyCustomGreetElement extends HTMLElement {
+
+			public static observedAttributes = ['title'];
+
+			
+			attributeChangedCallback() {
+			  this.innerHTML = `<h1 style="font-weight: bold;font-style: italic; color:red;">Welcome to ${this.title} !!!!</h1>`;
+			}
+		}
+
+		customElements.define('my-greeting', MyCustomGreetElement);
+
+- Importing this custom element in Angular application:
+	- import the library in apps\sample-angular\src\main.ts
+		- import "@sample-monorepo/lib-shared";
+	- since this is the custom element we need to add custom element schema in appModule.ts
+		- schemas: [CUSTOM_ELEMENTS_SCHEMA],
+	- Now add this custom element tag in app.component.html and verify
+		- <my-greeting title="NX Angular APP"></my-greeting>
+	- Restart angular app and verify whether it is appearing or not.
+
+- Importing this custom element in React Application.
+	- import the library in apps\sample-react\src\main.tsx
+		- import "@sample-monorepo/lib-shared";
+	- Add -> it is equivalent to adding CUSTOM_ELEMENTS_SCHEMA in angular.
+		- apps\sample-react\src\intrinsic.d.ts;
+	- Add my-greting tag in apps\sample-react\src\app\app.tsx
+	- restart react application
